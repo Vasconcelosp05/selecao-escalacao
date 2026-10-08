@@ -3,9 +3,9 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#075a3a">
-  <meta name="description" content="Escalação interativa da Seleção Brasileira.">
-  <title>Canarinho FC — Escale a Seleção</title>
+  <meta name="theme-color" content="#101b4d">
+  <meta name="description" content="World XI Cup — monte seu time global e dispute o mundo.">
+  <title>World XI Cup — Monte seu time</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800&family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -13,13 +13,14 @@
   <style>
     .game-mode{position:relative;overflow:hidden;padding:94px max(7vw,28px) 78px;color:#fff;background:linear-gradient(125deg,#062e22,#075a3a 48%,#0a3f2d)}.game-mode:before{content:"";position:absolute;inset:0;background:radial-gradient(circle at 88% 18%,#f7cf272b 0 1px,transparent 2px),radial-gradient(circle at 10% 80%,#56d49c1e 0 1px,transparent 2px);background-size:23px 23px,31px 31px}.game-mode>*{position:relative;z-index:1}.game-mode-intro{display:grid;grid-template-columns:minmax(260px,.7fr) minmax(450px,1.3fr);gap:60px;align-items:end;max-width:1180px;margin:0 auto 46px}.game-mode-intro h2{margin:0 0 15px;color:#fff;font:800 clamp(55px,7vw,92px)/.78 var(--condensed);letter-spacing:-.04em;text-transform:uppercase}.game-mode-intro h2 em{color:var(--yellow);font-style:normal}.game-mode-intro>p:not(.eyebrow){max-width:500px;margin:0;color:#c0dbc7;font-size:14px;line-height:1.75}.game-record{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;margin-top:28px;background:#ffffff25}.game-record>div{padding:15px 13px;background:#063d2d}.game-record strong{display:block;color:var(--yellow);font:800 28px/.85 var(--condensed);letter-spacing:.02em}.game-record span{display:block;margin-top:8px;color:#a9cdb6;font:500 7px var(--mono);letter-spacing:.1em}.match-console{max-width:1180px;margin:auto;border:1px solid #e9f2db3d;background:#062b20;box-shadow:11px 11px 0 #f7cf27}.match-console-top{display:flex;justify-content:space-between;align-items:center;min-height:42px;padding:0 17px;border-bottom:1px solid #ffffff20;color:#a3cab2;font:600 8px var(--mono);letter-spacing:.09em}.mode-chip{padding:5px 7px;color:#0b3d29;background:var(--yellow);font-weight:800}.scoreboard{display:grid;grid-template-columns:1fr 1.05fr 1fr;align-items:center;min-height:174px;padding:24px 26px;background:linear-gradient(90deg,#07553b,#063b2a 50%,#0b503a)}.score-team{display:grid;justify-items:center;gap:7px;text-align:center}.score-team strong{font:800 clamp(24px,3vw,38px)/.85 var(--condensed);letter-spacing:.04em}.score-team small,.score-core small{color:#b5d5bf;font:500 8px var(--mono);letter-spacing:.1em}.score-flag{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;color:var(--green);background:var(--yellow);font-size:24px}.opponent-team .score-flag{color:#fff;background:#ffffff19}.score-core{display:grid;justify-items:center;gap:8px;border-right:1px solid #ffffff22;border-left:1px solid #ffffff22;text-align:center}.score-core>span{color:var(--yellow);font:700 8px var(--mono);letter-spacing:.13em}.score-core strong{display:flex;align-items:center;gap:14px;color:#fff;font:800 68px/.7 var(--condensed)}.score-core strong i{color:#f7cf27;font-style:normal}.match-events{display:flex;align-items:center;justify-content:center;gap:13px;min-height:48px;padding:10px 18px;color:#b9d8c4;background:#05291e;font:600 10px var(--mono);letter-spacing:.02em;text-align:center}.match-events span{padding:2px 5px}.match-events .home{color:#fbe477}.match-events .away{color:#d5e9dc}.match-events b{font-weight:800}.play-match-button{display:block;width:100%;border:0;padding:18px;color:#0c3e2a;background:var(--yellow);font:800 11px var(--mono);letter-spacing:.1em;transition:.2s}.play-match-button:hover{color:#fff;background:#0a794c}.opponents-wrap{max-width:1180px;margin:64px auto 0}.opponents-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;color:#fff;font:800 12px var(--mono);letter-spacing:.1em}.opponents-heading small{color:#a6c8b1;font:500 8px var(--mono);letter-spacing:.07em}.opponents-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}.opponent-card{display:flex;align-items:center;gap:12px;width:100%;padding:12px;border:1px solid #ffffff28;color:#fff;background:#063b2b;text-align:left;transition:.2s}.opponent-card:hover,.opponent-card.selected{border-color:var(--yellow);background:#0a553b;transform:translateY(-2px)}.opponent-card.selected{box-shadow:inset 3px 0 var(--team-color)}.opponent-flag{font-size:24px}.opponent-card strong{display:block;font:800 18px/.9 var(--condensed);letter-spacing:.03em}.opponent-card small{display:block;margin-top:5px;color:#b5d3bf;font:500 7px var(--mono);letter-spacing:.07em}.opponent-card i{margin-left:auto;color:var(--yellow);font:800 24px/.8 var(--condensed);font-style:normal}.match-history{display:grid;grid-template-columns:230px 1fr;gap:28px;max-width:1180px;margin:52px auto 0;padding-top:35px;border-top:1px solid #ffffff2a}.match-history h3{margin:0;color:#fff;font:800 30px/.9 var(--condensed);text-transform:uppercase}.history-list{display:flex;flex-wrap:wrap;gap:8px;align-content:start}.history-empty{color:#a9cdb6;font-size:12px}.history-card{display:flex;gap:10px;align-items:center;min-width:220px;padding:10px 12px;border:1px solid #ffffff23;background:#073d2c}.history-card>span{display:grid;place-items:center;width:26px;height:26px;border-radius:50%;color:#fff;background:#a43d3d;font:800 15px var(--condensed)}.history-card.v>span{color:#12442e;background:var(--yellow)}.history-card.e>span{background:#427766}.history-card strong{display:block;font:700 9px var(--mono);letter-spacing:.02em}.history-card small{display:block;margin-top:5px;color:#a9cbb5;font:500 7px var(--mono)}.nation-select{display:grid;gap:5px;color:#789083;font:500 8px var(--mono);letter-spacing:.08em}.nation-select select{height:42px;padding:0 28px 0 11px;border:1px solid #d5dfd3;color:var(--green);background:#fff;font:800 10px var(--mono);letter-spacing:.02em;outline-color:var(--yellow)}.player-actions{position:absolute;right:10px;bottom:7px;display:none;gap:4px}.player-card:hover .player-actions{display:flex}.player-card:hover .player-rating{display:none}.scale-player{position:static!important;display:block!important}.captain-player{padding:4px 6px;border:0;color:#0d412c;background:var(--yellow);font:800 7px var(--mono)}.captain-player.is-captain{color:#fff;background:var(--green)}.empty-roster{grid-column:1/-1;margin:0;padding:35px;color:#6c8075;text-align:center;border:1px dashed #c6d5c8;font-size:13px}@media(max-width:1000px){.game-mode-intro{grid-template-columns:1fr;gap:20px}.opponents-grid{grid-template-columns:repeat(2,1fr)}.match-history{grid-template-columns:1fr}}@media(max-width:700px){.game-mode{padding:68px 20px 58px}.game-mode-intro h2{font-size:62px}.game-record>div{padding:13px 7px}.game-record strong{font-size:22px}.scoreboard{grid-template-columns:1fr 1.2fr 1fr;min-height:142px;padding:18px 8px}.score-team strong{font-size:20px}.score-team small{font-size:6px}.score-flag{width:34px;height:34px;font-size:18px}.score-core strong{gap:7px;font-size:45px}.score-core small{font-size:6px}.match-events{font-size:8px}.opponents-grid{grid-template-columns:1fr}.match-history{gap:18px}.history-card{width:100%;min-width:0}.nation-select{margin:0 0 13px}.nation-select select{width:100%}}
   </style>
+  <link rel="stylesheet" href="theme.css">
 </head>
 <body>
   <div class="top-stripe" aria-hidden="true"></div>
   <header class="site-header">
-    <a class="brand" href="#inicio" aria-label="Canarinho FC — início">
-      <img class="cbf-logo" src="https://www.citypng.com/public/uploads/preview/download-hd-brazil-national-football-team-logo-png-701751694776765v7uoiz5kwu.png?v=2026033011" alt="Escudo da CBF">
-      <span class="brand-copy"><b>CANARINHO</b><small>ESCALAÇÃO OFICIAL</small></span>
+    <a class="brand" href="#inicio" aria-label="World XI Cup — início">
+      <span class="world-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+      <span class="brand-copy"><b>WORLD XI</b><small>CUP EDITION</small></span>
     </a>
     <nav aria-label="Navegação principal">
       <a href="#escalacao">escalação</a>
@@ -28,7 +29,7 @@
       <a href="#banco">banco</a>
     </nav>
     <div class="header-badges">
-      <span class="fifa-mark" aria-label="FIFA">FIFA<sup>™</sup></span>
+      <span class="tournament-mark" aria-label="World Cup Edition">WORLD CUP<br><sup>EDITION</sup></span>
       <button class="help-button" id="helpButton" type="button" aria-label="Como funciona">?</button>
     </div>
   </header>
@@ -36,24 +37,24 @@
   <main id="inicio">
     <section class="hero">
       <div class="hero-copy">
-        <p class="eyebrow"><i></i> SELEÇÃO BRASILEIRA · MODO TÉCNICO</p>
-        <h1>Seu jogo.<br><em>Sua seleção.</em></h1>
-        <p class="hero-text">Monte seu elenco global, escolha o capitão e leve a sua seleção personalizada para desafiar as maiores nações do futebol.</p>
+        <p class="eyebrow"><i></i> A COPA COMEÇA NO SEU TIME</p>
+        <h1>O mundo.<br><em>No seu XI.</em></h1>
+        <p class="hero-text">Monte um elenco global, escolha o capitão e leve a sua seleção personalizada para desafiar as maiores nações do futebol.</p>
         <a class="scroll-link" href="#escalacao">MONTAR ELENCO <span>↓</span></a>
       </div>
-      <div class="hero-stadium" aria-label="Ilustração de um estádio brasileiro">
+      <div class="hero-stadium" aria-label="Ilustração de um estádio de Copa do Mundo">
         <div class="sun-disc"></div><div class="hero-ball">✦</div>
         <div class="stadium-lights one"></div><div class="stadium-lights two"></div>
         <div class="stands"><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
         <div class="grass-band"></div>
-        <p class="hero-score"><b>BRASIL</b><span>5 ESTRELAS</span></p>
+        <p class="hero-score"><b>WORLD XI</b><span>ONE GAME · ONE WORLD</span></p>
       </div>
     </section>
 
     <section class="game-mode" id="jogo" aria-labelledby="game-title">
       <div class="game-mode-intro">
-        <p class="eyebrow light"><i></i> CANARINHO WORLD TOUR</p>
-        <h2 id="game-title">Modo <em>Jogo</em></h2>
+        <p class="eyebrow light"><i></i> WORLD XI CUP TOUR</p>
+        <h2 id="game-title">Rumo à <em>copa</em></h2>
         <p>Forme um supertime com jogadores de várias nacionalidades e simule partidas contra seleções do mundo. Cada resultado constrói sua campanha.</p>
         <div class="game-record" aria-label="Sua campanha">
           <div><strong id="coinValue">1.500</strong><span>MOEDAS</span></div>
@@ -62,7 +63,7 @@
         </div>
       </div>
       <div class="match-console">
-        <div class="match-console-top"><span class="mode-chip">WORLD TOUR</span><span id="matchStatus">ESCOLHA UM ADVERSÁRIO</span></div>
+        <div class="match-console-top"><span class="mode-chip">WORLD CUP TOUR</span><span id="matchStatus">ESCOLHA UM ADVERSÁRIO</span></div>
         <div class="scoreboard" aria-live="polite">
           <div class="score-team user-team"><span class="score-flag">★</span><strong>SEU XI</strong><small id="userRating">NOTA 0.0</small></div>
           <div class="score-core"><span id="matchMinute">PRÉ-JOGO</span><strong><b id="homeScore">—</b><i>:</i><b id="awayScore">—</b></strong><small id="matchCompetition">AMISTOSO INTERNACIONAL</small></div>
@@ -71,8 +72,12 @@
         <div class="match-events" id="matchEvents"><span>Monte 11 jogadores e escolha uma seleção para começar sua jornada.</span></div>
         <button class="play-match-button" id="playMatchButton" type="button">▶ SIMULAR PARTIDA</button>
       </div>
+      <section class="knockout-panel" aria-labelledby="knockout-title">
+        <div class="knockout-heading"><span id="knockout-title">CHAVE MATA-MATA</span><small id="knockoutStatus">OITAVAS DE FINAL</small></div>
+        <div class="knockout-bracket" id="knockoutBracket" aria-live="polite"></div>
+      </section>
       <div class="opponents-wrap">
-        <div class="opponents-heading"><span>DESAFIOS DISPONÍVEIS</span><small>selecione uma seleção</small></div>
+        <div class="opponents-heading"><span>ADVERSÁRIOS DA COPA</span><button class="random-opponent-button" id="randomOpponentButton" type="button">↻ SORTEAR DESAFIO</button></div>
         <div class="opponents-grid" id="opponentsGrid"></div>
       </div>
       <div class="match-history" aria-labelledby="history-title"><div><p class="eyebrow light"><i></i> ÚLTIMOS RESULTADOS</p><h3 id="history-title">Campanha do treinador</h3></div><div class="history-list" id="historyList"><span class="history-empty">Sua primeira partida vai aparecer aqui.</span></div></div>
@@ -111,7 +116,7 @@
         </div>
         <div class="pitch" id="pitch" aria-label="Campo com jogadores escalados">
           <div class="pitch-lines" aria-hidden="true"><i class="halfway"></i><i class="circle"></i><i class="box box-top"></i><i class="box box-bottom"></i></div>
-          <div class="pitch-label top">BRASIL</div><div class="pitch-label bottom">RUMO AO HEXA</div>
+          <div class="pitch-label top">WORLD XI</div><div class="pitch-label bottom">CUP TOUR</div>
           <div id="formationSlots"></div>
         </div>
         <div class="pitch-actions">
@@ -145,11 +150,11 @@
     <section class="bench-section" id="banco" aria-labelledby="bench-title">
       <div class="bench-heading"><p class="eyebrow light"><i></i> OPÇÕES DE JOGO</p><h2 id="bench-title">Banco de reservas</h2></div>
       <div class="bench-list" id="benchList"></div>
-      <p class="bench-footer">As estatísticas são ilustrativas e servem para a brincadeira de montar sua própria Seleção.</p>
+      <p class="bench-footer">As estatísticas são ilustrativas e servem para a brincadeira de montar o seu XI mundial.</p>
     </section>
   </main>
 
-  <footer class="site-footer"><span>CANARINHO FC · UMA EXPERIÊNCIA DE FÃ</span><span>CBF &amp; FIFA são marcas de seus respectivos titulares.</span></footer>
+  <footer class="site-footer"><span>WORLD XI CUP · UMA EXPERIÊNCIA DE FÃ</span><span>Projeto independente, criado para celebrar o futebol mundial.</span></footer>
 
   <dialog class="modal" id="helpModal">
     <button class="modal-close" id="closeHelp" type="button" aria-label="Fechar">×</button>

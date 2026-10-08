@@ -1,0 +1,142 @@
+:root {
+  --green: #1556a9;
+  --green-deep: #111c4f;
+  --green-bright: #14b8c6;
+  --yellow: #ff674b;
+  --yellow-soft: #ffb18d;
+  --blue: #5b2f83;
+  --ink: #172453;
+  --cream: #f4f6ff;
+  --line: #d7dff2;
+  --shadow: 0 20px 55px #111c4f1f;
+}
+
+body { background: var(--cream); }
+.top-stripe { height: 6px; background: linear-gradient(90deg, #111c4f 0 25%, #14b8c6 25% 50%, #ff674b 50% 75%, #f1c95d 75%); }
+.site-header { background: #fafbffff; border-color: #dce3f4; }
+.brand { color: var(--green-deep); gap: 13px; }
+.world-mark { position: relative; display: grid; place-items: center; width: 46px; height: 46px; overflow: hidden; border: 3px solid var(--green-deep); border-radius: 50%; background: radial-gradient(circle at 68% 28%, #f5cb58 0 8%, transparent 9%), #14b8c6; box-shadow: 0 4px 0 #111c4f18; }
+.world-mark::before, .world-mark::after, .world-mark i { position: absolute; display: block; content: ''; border: 1.5px solid #fff; border-radius: 50%; opacity: .94; }
+.world-mark::before { width: 50px; height: 18px; transform: rotate(-20deg); }
+.world-mark::after { width: 17px; height: 52px; }
+.world-mark i:nth-child(1) { width: 58px; height: 56px; }
+.world-mark i:nth-child(2) { width: 56px; height: 12px; transform: rotate(31deg); }
+.world-mark i:nth-child(3) { width: 12px; height: 56px; transform: rotate(56deg); }
+.brand-copy b { letter-spacing: .035em; }
+.brand-copy small { color: #5570a1; }
+.site-header nav a { color: #41537d; }
+.site-header nav a:after { background: var(--yellow); }
+.header-badges { gap: 16px; }
+.tournament-mark { color: #111c4f; font: 900 14px/.68 var(--condensed); letter-spacing: .06em; text-align: right; }
+.tournament-mark sup { color: #f0523d; font: 700 7px var(--mono); letter-spacing: .12em; }
+.help-button { color: var(--green); border-color: #c9d7ef; }
+.help-button:hover { background: var(--green-deep); }
+
+.hero { background: linear-gradient(110deg, #f7f8ff 0 50%, #e8edff 50%); }
+.hero h1 { color: var(--green-deep); }
+.hero h1 em, .players-heading h2 em { color: #e5533d; }
+.eyebrow { color: #1765bd; }
+.hero-text { color: #526388; }
+.scroll-link { background: var(--green-deep); box-shadow: 6px 6px 0 var(--yellow); }
+.hero-stadium { background: linear-gradient(145deg, #111c4f 0%, #192b72 52%, #482a77 52%); }
+.hero-stadium::before { background: linear-gradient(113deg, #ffffff16 1px, transparent 1px), linear-gradient(#ffffff0d 1px, transparent 1px); background-size: 42px 42px; }
+.sun-disc { border-color: #f7d568; box-shadow: 0 0 0 7px #ffffff12; }
+.hero-ball { color: #24336e; background: #f8f4e7; border-color: #f4cf69; }
+.stadium-lights { background: #d9f6fb; box-shadow: 0 0 15px #b8f5ff; }
+.stadium-lights::after { background: #899bd1; }
+.stands { background: #0b1641; }
+.stands i { background: repeating-linear-gradient(90deg, #f76b52 0 3px, transparent 3px 8px), #273c83; }
+.stands i:nth-child(even) { background: repeating-linear-gradient(90deg, #1fd0d3 0 3px, transparent 3px 8px), #39236a; }
+.grass-band { background: repeating-linear-gradient(90deg, #1556a9 0 70px, #144897 70px 140px); border-top-color: #f1c95d; }
+.hero-score span { color: #f7d568; }
+
+.game-mode { background: linear-gradient(125deg, #111c4f, #1b3983 48%, #532c75) !important; }
+.game-mode::before { background: radial-gradient(circle at 88% 18%, #ffd96a4d 0 1px, transparent 2px), radial-gradient(circle at 10% 80%, #26d0d74a 0 1px, transparent 2px) !important; }
+.game-mode-intro h2 em { color: #ffb59d; }
+.game-mode-intro > p:not(.eyebrow) { color: #d3ddff; }
+.game-record > div { background: #101b4ea8; }
+.game-record strong { color: #f9d46d; }
+.game-record span { color: #becbf0; }
+.match-console { border-color: #cbd7ff75; background: #101a4a; box-shadow: 11px 11px 0 #ff674b; }
+.match-console-top { color: #c6d2f4; }
+.mode-chip { color: #fff; background: #ff674b; }
+.scoreboard { background: linear-gradient(90deg, #19499d, #172a70 50%, #542b79); }
+.score-flag { color: #111c4f; background: #f8d36b; }
+.score-core > span, .score-core strong i { color: #ffb59d; }
+.score-team small, .score-core small { color: #cbd7ff; }
+.match-events { color: #d5dfff; background: #0c143b; }
+.match-events .home { color: #f7d568; }
+.play-match-button { color: #fff; background: #ff674b; }
+.play-match-button:hover { background: #14aabb; }
+.knockout-panel { max-width: 1180px; margin: 28px auto 0; border: 1px solid #c5d0f05c; background: #111d50a6; }
+.knockout-heading { display: flex; justify-content: space-between; gap: 16px; align-items: center; min-height: 42px; padding: 0 16px; color: #fff; border-bottom: 1px solid #c5d0f03d; font: 800 9px var(--mono); letter-spacing: .11em; }
+.knockout-heading small { color: #f8d36b; font: 800 8px var(--mono); letter-spacing: .08em; }
+.knockout-bracket { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #a9b9e72c; }
+.knockout-stage { display: grid; gap: 7px; min-height: 103px; padding: 17px 15px; background: #152760; }
+.knockout-stage > span { color: #8fa7df; font: 700 8px var(--mono); letter-spacing: .12em; }
+.knockout-stage strong { color: #fff; font: 800 21px/.9 var(--condensed); letter-spacing: .035em; }
+.knockout-stage small { color: #b8c8ef; font: 600 7px var(--mono); letter-spacing: .05em; }
+.knockout-stage.atual { background: linear-gradient(135deg, #1e59ad, #254184); box-shadow: inset 3px 0 #f8d36b; }
+.knockout-stage.atual small { color: #f8d36b; }
+.knockout-stage.concluida { background: #143f7c; }
+.knockout-stage.concluida small { color: #72e3d7; }
+.knockout-stage.campeao { background: linear-gradient(135deg, #e26945, #8d3476); }
+.knockout-stage.campeao small { color: #fff4c8; }
+.scoreless { color: #aebce3; }
+.opponent-card { background: #17275f; border-color: #b8c8f04d; }
+.opponent-card:hover, .opponent-card.selected { background: #284695; border-color: #f8d36b; }
+.opponent-card i { color: #f7d568; }
+.opponent-card small, .opponents-heading small { color: #becbf0; }
+.random-opponent-button { border: 1px solid #f8d36b; padding: 8px 10px; color: #111c4f; background: #f8d36b; font: 800 8px var(--mono); letter-spacing: .07em; transition: transform .2s, background .2s; }
+.random-opponent-button:hover { color: #fff; background: #ff674b; border-color: #ff674b; transform: translateY(-2px); }
+.play-match-button:disabled { cursor: wait; color: #d5ddf8; background: #344985; }
+.match-events .goal { color: #f7d568; }
+.match-events .chance { color: #d8e2ff; }
+.match-events .half, .match-events .final, .match-events .kickoff { color: #a9dfe9; }
+.match-history { border-color: #bdcaf34d; }
+.history-empty { color: #becbf0; }
+.history-card { background: #14245b; border-color: #bdcaf34d; }
+.history-card.v > span { color: #111c4f; background: #f8d36b; }
+
+.dashboard { box-shadow: 0 22px 48px #111c4f26; }
+.squad-panel { background: #fff; }
+.panel-heading h2, .pitch-toolbar h2, .players-heading h2, .modal h2 { color: var(--green-deep); }
+.live-chip { color: #526b9a; background: #edf2ff; }
+.live-chip b { background: #14b8c6; box-shadow: 0 0 0 4px #14b8c61c; }
+.manager-avatar { color: #fff; background: var(--green-deep); border-color: #f8d36b; }
+.formation-readout, .squad-stats dt { color: #175db6; }
+.captain-card { background: #fff4ed; border-left-color: var(--yellow); }
+.captain-card > span { background: var(--green-deep); }
+.tip-card span { color: #ec6248; }
+.formation-select select { color: var(--green-deep); outline-color: var(--yellow); }
+.pitch { background: repeating-linear-gradient(90deg, #1965bb 0 11.1%, #1759ad 11.1% 22.2%); box-shadow: inset 0 0 0 1px #1b5bb4; }
+.pitch::after { background: radial-gradient(circle at 50% 50%, transparent 0 75px, #0b3a851f 76px, transparent 77px); }
+.pitch-label { color: #dceeff20; }
+.field-player { background: #5b2f83; border-color: #f8d36b; box-shadow: 0 6px 0 #111c4f55, 0 0 0 6px #ffffff20; }
+.field-player.captain::after { color: #111c4f; background: #f8d36b; }
+.field-slot small { color: #d6f9ff; }
+.primary-button { color: #fff; background: var(--yellow); box-shadow: 4px 4px 0 var(--green-deep); }
+.secondary-button { color: var(--green-deep); background: #edf2ff; }
+.secondary-button:hover { background: #dae5ff; }
+.players-summary strong, .player-rating { color: #e65740; }
+.search-box { color: var(--green); border-color: #d3ddf3; }
+.filter.active, .filter:hover { border-color: var(--green-deep); background: var(--green-deep); }
+.player-card.selected { border-color: var(--green); background: #f1f5ff; }
+.selected .position-tag, .scale-player { background: var(--green-deep); }
+.bench-section { background: linear-gradient(115deg, #101a48, #192d70); }
+.eyebrow.light { color: #f7d568; }
+.bench-number { color: #f7d568; }
+.bench-player small, .bench-footer { color: #b9c8ee; }
+.site-footer { background: #090f2d; color: #9db0df; }
+.modal { box-shadow: 13px 14px 0 var(--yellow); }
+.modal::backdrop { background: #080e29dc; }
+.modal-icon { color: #ec6248; }
+.toast { background: var(--green-deep); }
+
+@media (max-width: 700px) {
+  .world-mark { width: 38px; height: 38px; }
+  .tournament-mark { font-size: 11px; }
+  .knockout-bracket { grid-template-columns: 1fr 1fr; }
+  .knockout-stage { min-height: 88px; padding: 13px; }
+  .knockout-stage strong { font-size: 18px; }
+}

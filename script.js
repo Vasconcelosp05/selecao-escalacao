@@ -87,14 +87,17 @@ const coordinates = {
   '3-5-2': {GOL:[[50,87]], DEF:[[22,71],[50,74],[78,71]], MEI:[[12,49],[31,53],[50,48],[69,53],[88,49]], ATA:[[34,24],[66,24]]}
 };
 
-const defaults = ['alisson','danilo','marquinhos','gabriel','arana','casemiro','bruno','paqueta','raphinha','vinicius','rodrygo'];
-const storageKey = 'canarinho-fc-squad-v2';
-const state = JSON.parse(localStorage.getItem(storageKey) || localStorage.getItem('canarinho-fc-squad-v1') || 'null') || {formation:'4-3-3', selected:defaults, captain:'vinicius'};
-const gameStorageKey = 'canarinho-fc-world-tour-v1';
-const gameState = JSON.parse(localStorage.getItem(gameStorageKey) || 'null') || {coins:1500,wins:0,draws:0,losses:0,history:[],opponent:'argentina'};
+const defaults = ['world-franca-maignan','world-portugal-ruben-dias','world-espanha-carvajal','world-holanda-van-dijk','world-franca-theo-hernandez','world-espanha-rodri','world-alemanha-musiala','world-croacia-modric','world-argentina-messi','world-franca-mbappe','world-portugal-cristiano-ronaldo'];
+const storageKey = 'world-xi-cup-squad-v1';
+const state = JSON.parse(localStorage.getItem(storageKey) || 'null') || {formation:'4-3-3', selected:defaults, captain:'world-argentina-messi'};
+const gameStorageKey = 'world-xi-cup-tour-v1';
+const gameState = JSON.parse(localStorage.getItem(gameStorageKey) || 'null') || {coins:1500,wins:0,draws:0,losses:0,history:[],opponent:nationalTeams[Math.floor(Math.random() * nationalTeams.length)].id};
+gameState.knockout ||= {round:0, wins:[], eliminated:false, champion:false};
 let activeFilter = 'TODOS';
 let activeNation = 'TODOS';
 let matchResult = null;
+let matchInProgress = false;
+let liveMatch = null;
 
 const byId = id => players.find(player => player.id === id);
 const selectedPlayers = () => state.selected.map(byId).filter(Boolean);
@@ -109,7 +112,8 @@ const elements = {
   homeScore:document.getElementById('homeScore'), awayScore:document.getElementById('awayScore'), minute:document.getElementById('matchMinute'),
   competition:document.getElementById('matchCompetition'), opponentName:document.getElementById('opponentName'), opponentFlag:document.getElementById('opponentFlag'),
   opponentRating:document.getElementById('opponentRating'), userRating:document.getElementById('userRating'), events:document.getElementById('matchEvents'),
-  play:document.getElementById('playMatchButton'), history:document.getElementById('historyList')
+  play:document.getElementById('playMatchButton'), history:document.getElementById('historyList'), randomOpponent:document.getElementById('randomOpponentButton'),
+  knockout:document.getElementById('knockoutBracket'), knockoutStatus:document.getElementById('knockoutStatus')
 };
 
 function save() { localStorage.setItem(storageKey, JSON.stringify(state)); localStorage.setItem(gameStorageKey, JSON.stringify(gameState)); }
@@ -119,6 +123,9 @@ function groupedSelection(position) { return selectedPlayers().filter(player => 
 function initials(name) { return name.split(' ').slice(0,2).map(word => word[0]).join(''); }
 function squadRating() { const selected = selectedPlayers(); return selected.length ? selected.reduce((sum, player) => sum + player.rating, 0) / selected.length : 0; }
 function currentOpponent() { return nationalTeams.find(team => team.id === gameState.opponent) || nationalTeams[0]; }
+const knockoutRounds = ['OITAVAS DE FINAL','QUARTAS DE FINAL','SEMIFINAL','FINAL'];
+function currentRound() { return knockoutRounds[Math.min(gameState.knockout.round, knockoutRounds.length - 1)]; }
+function resetKnockout() { gameState.knockout = {round:0, wins:[], eliminated:false, champion:false}; }
 
 function renderStats() {
   const selected = selectedPlayers();
@@ -196,9 +203,24 @@ function renderHistory() {
   elements.history.innerHTML = gameState.history.slice(0,5).map(match => `<article class="history-card ${match.result.toLowerCase()}"><span>${match.result}</span><div><strong>SEU XI ${match.home} × ${match.away} ${match.flag} ${match.opponent}</strong><small>+${match.reward} moedas · ${match.competition}</small></div></article>`).join('');
 }
 
+function renderKnockout() {
+  const knockout = gameState.knockout;
+  const stateLabel = knockout.champion ? 'CAMPEÃO DO MUNDO' : knockout.eliminated ? 'ELIMINADO — INICIE UMA NOVA COPA' : `EM JOGO · ${currentRound()}`;
+  elements.knockoutStatus.textContent = stateLabel;
+  elements.knockout.innerHTML = knockoutRounds.map((round, index) => {
+    const result = knockout.wins[index];
+    const isCurrent = !knockout.eliminated && !knockout.champion && index === knockout.round;
+    const isChampion = knockout.champion && index === knockoutRounds.length - 1;
+    const status = result ? 'concluida' : isChampion ? 'campeao' : isCurrent ? 'atual' : 'aguardando';
+    const detail = result ? `✓ ${result.opponent}` : isChampion ? '★ CAMPEÃO' : isCurrent ? 'SEU PRÓXIMO DESAFIO' : 'AGUARDANDO';
+    return `<article class="knockout-stage ${status}"><span>${String(index + 1).padStart(2,'0')}</span><strong>${round}</strong><small>${detail}</small></article>`;
+  }).join('');
+}
+
 function renderOpponents() {
   elements.opponents.innerHTML = nationalTeams.map(team => `<button type="button" class="opponent-card ${team.id === gameState.opponent ? 'selected' : ''}" data-team="${team.id}" style="--team-color:${team.color}"><span class="opponent-flag">${team.flag}</span><span><strong>${team.name}</strong><small>NOTA ${team.rating.toFixed(1)} · ${'★'.repeat(team.difficulty)}</small></span><i>›</i></button>`).join('');
   elements.opponents.querySelectorAll('.opponent-card').forEach(button => button.addEventListener('click', () => {
+    if (matchInProgress) return;
     gameState.opponent = button.dataset.team;
     matchResult = null;
     showToast(`${currentOpponent().name} aceita o desafio.`);
@@ -217,24 +239,36 @@ function renderGame() {
   elements.opponentName.textContent = rival.name.toUpperCase();
   elements.opponentFlag.textContent = rival.flag;
   elements.opponentRating.textContent = `NOTA ${rival.rating.toFixed(1)}`;
-  if (matchResult) {
+  if (matchInProgress && liveMatch) {
+    elements.homeScore.textContent = liveMatch.home;
+    elements.awayScore.textContent = liveMatch.away;
+    elements.minute.textContent = `${liveMatch.minute}'`;
+    elements.competition.textContent = `MATA-MATA · ${currentRound()} · AO VIVO`;
+    elements.matchStatus.textContent = `${currentRound()} · ${rival.name.toUpperCase()} CAIU NO SEU CAMINHO`;
+    elements.events.innerHTML = liveMatch.events.length ? liveMatch.events.map(liveEventMarkup).join('') : '<span class="scoreless">—</span>';
+    elements.play.textContent = '● PARTIDA EM ANDAMENTO';
+    elements.play.disabled = true;
+  } else if (matchResult) {
     elements.homeScore.textContent = matchResult.home;
     elements.awayScore.textContent = matchResult.away;
     elements.minute.textContent = '90+';
-    elements.competition.textContent = matchResult.competition;
+    elements.competition.textContent = matchResult.penalties ? `${matchResult.competition} · PÊN. ${matchResult.penalties.home}×${matchResult.penalties.away}` : matchResult.competition;
     elements.matchStatus.textContent = matchResult.label;
-    elements.events.innerHTML = matchResult.events.map(event => `<span class="${event.side}"><b>${event.minute}'</b> ${event.scorer}</span>`).join('');
-    elements.play.textContent = '↻ JOGAR REVANCHE';
+    elements.events.innerHTML = matchResult.events.map(liveEventMarkup).join('');
+    elements.play.textContent = gameState.knockout.champion ? '★ INICIAR NOVA COPA' : gameState.knockout.eliminated ? '↻ RECOMEÇAR MATA-MATA' : '↻ SORTEAR PRÓXIMO DESAFIO';
+    elements.play.disabled = false;
   } else {
     elements.homeScore.textContent = '—';
     elements.awayScore.textContent = '—';
     elements.minute.textContent = selectedPlayers().length === 11 ? 'PRÉ-JOGO' : 'ELENCO INCOMPLETO';
-    elements.competition.textContent = `DESAFIO · ${rival.name.toUpperCase()}`;
-    elements.matchStatus.textContent = 'PRONTO PARA O DESAFIO';
-    elements.events.innerHTML = `<span>${selectedPlayers().length === 11 ? `Seu XI está pronto para enfrentar ${rival.name}.` : `Faltam ${11 - selectedPlayers().length} jogador(es) para iniciar a partida.`}</span>`;
-    elements.play.textContent = '▶ SIMULAR PARTIDA';
+    elements.competition.textContent = `MATA-MATA · ${currentRound()}`;
+    elements.matchStatus.textContent = gameState.knockout.champion ? 'VOCÊ CONQUISTOU A COPA' : gameState.knockout.eliminated ? 'FIM DE TORNEIO' : 'PRONTO PARA O DESAFIO';
+    elements.events.innerHTML = `<span>${gameState.knockout.champion ? 'Sua campanha terminou com a taça.' : gameState.knockout.eliminated ? 'Você caiu no mata-mata. Comece uma nova caminhada.' : selectedPlayers().length === 11 ? `Seu XI está pronto para ${currentRound().toLowerCase()}.` : `Faltam ${11 - selectedPlayers().length} jogador(es) para iniciar a partida.`}</span>`;
+    elements.play.textContent = gameState.knockout.champion ? '★ INICIAR NOVA COPA' : gameState.knockout.eliminated ? '↻ RECOMEÇAR MATA-MATA' : '▶ SORTEAR E SIMULAR PARTIDA';
+    elements.play.disabled = false;
   }
   renderOpponents();
+  renderKnockout();
   renderHistory();
 }
 
@@ -243,26 +277,78 @@ function randomGoal(power) {
   return Math.max(0, Math.min(5, Math.round(raw)));
 }
 function randomFrom(list) { return list[Math.floor(Math.random() * list.length)]; }
-function simulateMatch() {
+function drawOpponent(excludeId = '') {
+  const candidates = nationalTeams.filter(team => team.id !== excludeId);
+  const rival = randomFrom(candidates);
+  gameState.opponent = rival.id;
+  return rival;
+}
+
+function buildTimeline(goals) {
+  const checkpoints = [1, 15, 30, 45, 60, 75, 90].map(minute => ({minute, type:'clock', side:'neutral'}));
+  return [...checkpoints, ...goals].sort((a,b) => a.minute - b.minute || (a.type === 'goal' ? -1 : 1));
+}
+
+function liveEventMarkup(event) {
+  return `<span class="${event.side} goal"><b>${event.minute}'</b> ⚽ ${event.text || event.scorer}</span>`;
+}
+
+async function simulateMatch() {
+  if (matchInProgress) return;
   if (selectedPlayers().length !== 11) return showToast('Escalone 11 jogadores antes de entrar em campo.');
-  const rival = currentOpponent();
+  if (gameState.knockout.eliminated || gameState.knockout.champion) resetKnockout();
+  const rival = drawOpponent(currentOpponent().id);
+  const round = currentRound();
   const captainBonus = byId(state.captain)?.rating > 9 ? .18 : .05;
   let home = randomGoal(squadRating() + captainBonus);
   let away = randomGoal(rival.rating + Math.random() * .24);
   if (home === 0 && away === 0 && Math.random() > .5) home = 1;
-  const result = home > away ? 'V' : home === away ? 'E' : 'D';
-  const reward = result === 'V' ? 160 + rival.difficulty * 30 : result === 'E' ? 85 + rival.difficulty * 12 : 30 + rival.difficulty * 8;
+  let result = home > away ? 'V' : home < away ? 'D' : '';
+  let penalties = null;
+  if (!result) {
+    const userWinsPenalties = Math.random() + (squadRating() - rival.rating) * .13 + captainBonus > .56;
+    let homePenalties = userWinsPenalties ? 5 : 3 + Math.floor(Math.random() * 2);
+    let awayPenalties = userWinsPenalties ? 3 + Math.floor(Math.random() * 2) : 5;
+    penalties = {home:homePenalties, away:awayPenalties};
+    result = userWinsPenalties ? 'V' : 'D';
+  }
+  const reward = result === 'V' ? 160 + rival.difficulty * 30 : 30 + rival.difficulty * 8;
   const scorers = selectedPlayers().filter(player => player.position !== 'GOL').sort((a,b) => b.rating - a.rating);
   const minutes = Array.from({length:home + away + 5}, () => Math.floor(Math.random() * 82) + 7).sort((a,b) => a-b);
-  const events = [];
-  for (let index = 0; index < home; index++) events.push({minute:minutes.pop() || 90, scorer:randomFrom(scorers).name, side:'home'});
-  for (let index = 0; index < away; index++) events.push({minute:minutes.pop() || 90, scorer:randomFrom(rival.attack), side:'away'});
-  events.sort((a,b) => a.minute - b.minute);
-  const label = result === 'V' ? 'VITÓRIA DA SUA SELEÇÃO' : result === 'E' ? 'EMPATE NO APITO FINAL' : 'DERROTA — HORA DA REVANCHE';
-  const competition = rival.difficulty >= 4 ? 'CLASSIC MATCH' : 'WORLD TOUR';
-  matchResult = {home,away,events,label,competition};
+  const goals = [];
+  for (let index = 0; index < home; index++) goals.push({minute:minutes.pop() || 90, scorer:randomFrom(scorers).name, side:'home', type:'goal'});
+  for (let index = 0; index < away; index++) goals.push({minute:minutes.pop() || 90, scorer:randomFrom(rival.attack), side:'away', type:'goal'});
+  goals.sort((a,b) => a.minute - b.minute);
+  goals.forEach(goal => goal.text = goal.side === 'home' ? `GOL DO SEU XI — ${goal.scorer}` : `GOL DA ${rival.name.toUpperCase()} — ${goal.scorer}`);
+  const label = result === 'V' ? (penalties ? 'VITÓRIA NOS PÊNALTIS' : 'VITÓRIA — VOCÊ AVANÇOU') : (penalties ? 'DERROTA NOS PÊNALTIS' : 'DERROTA — FIM DA CAMPANHA');
+  const competition = `MATA-MATA · ${round}`;
+  matchResult = {home,away,events:goals,label,competition,penalties};
+  const timeline = buildTimeline(goals);
+  matchInProgress = true;
+  liveMatch = {home:0,away:0,minute:0,events:[]};
+  render();
+  for (const event of timeline) {
+    liveMatch.minute = event.minute;
+    if (event.type === 'goal') event.side === 'home' ? liveMatch.home++ : liveMatch.away++;
+    if (event.type === 'goal') {
+      liveMatch.events.unshift(event);
+      liveMatch.events = liveMatch.events.slice(0,4);
+    }
+    renderGame();
+    await new Promise(resolve => setTimeout(resolve, event.type === 'goal' ? 560 : 220));
+  }
+  matchInProgress = false;
+  liveMatch = null;
   gameState.coins += reward;
-  if (result === 'V') gameState.wins++; else if (result === 'E') gameState.draws++; else gameState.losses++;
+  if (result === 'V') {
+    gameState.wins++;
+    gameState.knockout.wins[gameState.knockout.round] = {opponent:rival.name};
+    if (gameState.knockout.round === knockoutRounds.length - 1) gameState.knockout.champion = true;
+    else gameState.knockout.round++;
+  } else {
+    gameState.losses++;
+    gameState.knockout.eliminated = true;
+  }
   gameState.history.unshift({result,home,away,opponent:rival.name,flag:rival.flag,reward,competition});
   gameState.history = gameState.history.slice(0,12);
   showToast(`${label}. Você recebeu ${reward} moedas.`);
@@ -310,6 +396,13 @@ document.querySelectorAll('.filter').forEach(button => button.addEventListener('
 document.getElementById('autoButton').addEventListener('click', autoScale);
 document.getElementById('resetButton').addEventListener('click', () => { state.selected = []; state.captain = null; matchResult = null; showToast('Prancheta limpa. Monte o seu XI mundial.'); render(); });
 elements.play.addEventListener('click', simulateMatch);
+elements.randomOpponent.addEventListener('click', () => {
+  if (matchInProgress) return;
+  const rival = drawOpponent(currentOpponent().id);
+  matchResult = null;
+  showToast(`SORTEIO DA COPA: ${rival.name.toUpperCase()} caiu no seu caminho.`);
+  render();
+});
 const helpModal = document.getElementById('helpModal');
 document.getElementById('helpButton').addEventListener('click', () => helpModal.showModal());
 document.getElementById('closeHelp').addEventListener('click', () => helpModal.close());
