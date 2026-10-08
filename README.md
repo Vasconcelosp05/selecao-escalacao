@@ -13,7 +13,7 @@ Abra `index.html` no navegador. Não é necessária instalação.
 - Escalação automática, orçamento, nota média e escolha de capitão
 - Copa eliminatória com oitavas, quartas, semifinal e final; derrotas encerram a campanha e empates são decididos nos pênaltis
 - Adversários sorteados a cada desafio, com 18 seleções disponíveis
-- Partidas rápidas com placar ao vivo, minuto a minuto e exibição somente dos gols
+- Partidas em tempo real: 90 segundos, intervalo aos 45, acréscimos aleatórios de 1 a 8 segundos e pênaltis nos empates
 - Estado da escalação e campanha salvos localmente no navegador
 - Layout responsivo para computador e celular
 

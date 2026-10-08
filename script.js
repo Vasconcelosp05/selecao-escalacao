@@ -243,19 +243,19 @@ function renderGame() {
   if (matchInProgress && liveMatch) {
     elements.homeScore.textContent = liveMatch.home;
     elements.awayScore.textContent = liveMatch.away;
-    elements.minute.textContent = `${liveMatch.minute}'`;
-    elements.competition.textContent = `MATA-MATA · ${currentRound()} · AO VIVO`;
-    elements.matchStatus.textContent = `${currentRound()} · ${rival.name.toUpperCase()} CAIU NO SEU CAMINHO`;
+    elements.minute.textContent = liveMatch.phase === 'penalties' ? 'PÊN.' : `${formatMatchClock(liveMatch.minute)}'`;
+    elements.competition.textContent = liveMatch.phase === 'interval' ? `MATA-MATA · ${currentRound()} · INTERVALO` : liveMatch.phase === 'penalties' ? `MATA-MATA · ${currentRound()} · PÊNALTIS` : `MATA-MATA · ${currentRound()} · AO VIVO`;
+    elements.matchStatus.textContent = liveMatch.phase === 'interval' ? 'INTERVALO — O 2º TEMPO COMEÇA EM BREVE' : liveMatch.phase === 'penalties' ? 'EMPATE — DECISÃO NOS PÊNALTIS' : liveMatch.minute > 90 ? `ACRÉSCIMOS · ${formatMatchClock(liveMatch.minute)}'` : liveMatch.minute > 45 ? `2º TEMPO · ${formatMatchClock(liveMatch.minute)}'` : `1º TEMPO · ${formatMatchClock(liveMatch.minute)}'`;
     elements.events.innerHTML = liveMatch.events.length ? liveMatch.events.map(liveEventMarkup).join('') : '<span class="scoreless">—</span>';
-    elements.play.textContent = '● PARTIDA EM ANDAMENTO';
+    elements.play.textContent = liveMatch.phase === 'interval' ? '● INTERVALO' : liveMatch.phase === 'penalties' ? '● DISPUTA DE PÊNALTIS' : '● PARTIDA EM ANDAMENTO';
     elements.play.disabled = true;
   } else if (matchResult) {
     elements.homeScore.textContent = matchResult.home;
     elements.awayScore.textContent = matchResult.away;
-    elements.minute.textContent = '90+';
+    elements.minute.textContent = `90+${matchResult.addedTime}'`;
     elements.competition.textContent = matchResult.penalties ? `${matchResult.competition} · PÊN. ${matchResult.penalties.home}×${matchResult.penalties.away}` : matchResult.competition;
     elements.matchStatus.textContent = matchResult.label;
-    elements.events.innerHTML = matchResult.events.map(liveEventMarkup).join('');
+    elements.events.innerHTML = matchResult.events.length ? matchResult.events.map(liveEventMarkup).join('') : '<span class="scoreless">—</span>';
     elements.play.textContent = gameState.knockout.champion ? '★ INICIAR NOVA COPA' : gameState.knockout.eliminated ? '↻ RECOMEÇAR MATA-MATA' : '↻ SORTEAR PRÓXIMO DESAFIO';
     elements.play.disabled = false;
   } else {
@@ -285,13 +285,28 @@ function drawOpponent(excludeId = '') {
   return rival;
 }
 
-function buildTimeline(goals) {
-  const checkpoints = [1, 15, 30, 45, 60, 75, 90].map(minute => ({minute, type:'clock', side:'neutral'}));
-  return [...checkpoints, ...goals].sort((a,b) => a.minute - b.minute || (a.type === 'goal' ? -1 : 1));
+function wait(milliseconds) { return new Promise(resolve => setTimeout(resolve, milliseconds)); }
+function formatMatchClock(second) { return second > 90 ? `90+${second - 90}` : `${second}`; }
+
+function createGoalEvents(home, away, totalSeconds, scorers, rival) {
+  const occupiedSeconds = new Set();
+  const nextSecond = () => {
+    let second;
+    do second = Math.floor(Math.random() * totalSeconds) + 1;
+    while (occupiedSeconds.has(second));
+    occupiedSeconds.add(second);
+    return second;
+  };
+  const goals = [];
+  for (let index = 0; index < home; index++) goals.push({second:nextSecond(), scorer:randomFrom(scorers).name, side:'home', type:'goal'});
+  for (let index = 0; index < away; index++) goals.push({second:nextSecond(), scorer:randomFrom(rival.attack), side:'away', type:'goal'});
+  goals.sort((a,b) => a.second - b.second);
+  goals.forEach(goal => goal.text = goal.side === 'home' ? `GOL DO SEU XI — ${goal.scorer}` : `GOL DA ${rival.name.toUpperCase()} — ${goal.scorer}`);
+  return goals;
 }
 
 function liveEventMarkup(event) {
-  return `<span class="${event.side} goal"><b>${event.minute}'</b> ⚽ ${event.text || event.scorer}</span>`;
+  return `<span class="${event.side} goal"><b>${formatMatchClock(event.second)}'</b> ⚽ ${event.text || event.scorer}</span>`;
 }
 
 async function simulateMatch() {
@@ -303,44 +318,57 @@ async function simulateMatch() {
   const captainBonus = byId(state.captain)?.rating > 9 ? .18 : .05;
   let home = randomGoal(squadRating() + captainBonus);
   let away = randomGoal(rival.rating + Math.random() * .24);
-  if (home === 0 && away === 0 && Math.random() > .5) home = 1;
+  const addedTime = Math.floor(Math.random() * 8) + 1;
+  const totalSeconds = 90 + addedTime;
+  const regularDraw = home === away;
   let result = home > away ? 'V' : home < away ? 'D' : '';
   let penalties = null;
   if (!result) {
     const userWinsPenalties = Math.random() + (squadRating() - rival.rating) * .13 + captainBonus > .56;
-    let homePenalties = userWinsPenalties ? 5 : 3 + Math.floor(Math.random() * 2);
-    let awayPenalties = userWinsPenalties ? 3 + Math.floor(Math.random() * 2) : 5;
+    const homePenalties = userWinsPenalties ? 5 : 3 + Math.floor(Math.random() * 2);
+    const awayPenalties = userWinsPenalties ? 3 + Math.floor(Math.random() * 2) : 5;
     penalties = {home:homePenalties, away:awayPenalties};
     result = userWinsPenalties ? 'V' : 'D';
   }
   const reward = result === 'V' ? 160 + rival.difficulty * 30 : 30 + rival.difficulty * 8;
   const scorers = selectedPlayers().filter(player => player.position !== 'GOL').sort((a,b) => b.rating - a.rating);
-  const minutes = Array.from({length:home + away + 5}, () => Math.floor(Math.random() * 82) + 7).sort((a,b) => a-b);
-  const goals = [];
-  for (let index = 0; index < home; index++) goals.push({minute:minutes.pop() || 90, scorer:randomFrom(scorers).name, side:'home', type:'goal'});
-  for (let index = 0; index < away; index++) goals.push({minute:minutes.pop() || 90, scorer:randomFrom(rival.attack), side:'away', type:'goal'});
-  goals.sort((a,b) => a.minute - b.minute);
-  goals.forEach(goal => goal.text = goal.side === 'home' ? `GOL DO SEU XI — ${goal.scorer}` : `GOL DA ${rival.name.toUpperCase()} — ${goal.scorer}`);
+  const goals = createGoalEvents(home, away, totalSeconds, scorers, rival);
   const label = result === 'V' ? (penalties ? 'VITÓRIA NOS PÊNALTIS' : 'VITÓRIA — VOCÊ AVANÇOU') : (penalties ? 'DERROTA NOS PÊNALTIS' : 'DERROTA — FIM DA CAMPANHA');
   const competition = `MATA-MATA · ${round}`;
-  matchResult = {home,away,events:goals,label,competition,penalties};
-  const timeline = buildTimeline(goals);
+  matchResult = {home,away,events:goals,label,competition,penalties,addedTime};
   matchInProgress = true;
-  liveMatch = {home:0,away:0,minute:0,events:[]};
+  liveMatch = {home:0,away:0,minute:0,events:[],phase:'first-half'};
   render();
-  for (const event of timeline) {
-    liveMatch.minute = event.minute;
-    if (event.type === 'goal') event.side === 'home' ? liveMatch.home++ : liveMatch.away++;
-    if (event.type === 'goal') {
-      liveMatch.events.unshift(event);
-      liveMatch.events = liveMatch.events.slice(0,4);
+
+  for (let second = 1; second <= totalSeconds; second++) {
+    if (second === 46) {
+      liveMatch.phase = 'interval';
+      liveMatch.minute = 45;
+      renderGame();
+      await wait(4000);
+      liveMatch.phase = 'second-half';
     }
+    if (second === 91) liveMatch.phase = 'stoppage-time';
+    await wait(1000);
+    liveMatch.minute = second;
+    goals.filter(goal => goal.second === second).forEach(goal => {
+      goal.side === 'home' ? liveMatch.home++ : liveMatch.away++;
+      liveMatch.events.unshift(goal);
+    });
+    liveMatch.events = liveMatch.events.slice(0,5);
     renderGame();
-    await new Promise(resolve => setTimeout(resolve, event.type === 'goal' ? 560 : 220));
   }
+
+  if (penalties) {
+    liveMatch.phase = 'penalties';
+    renderGame();
+    await wait(2500);
+  }
+
   matchInProgress = false;
   liveMatch = null;
   gameState.coins += reward;
+  if (regularDraw) gameState.draws++;
   if (result === 'V') {
     gameState.wins++;
     gameState.knockout.wins[gameState.knockout.round] = {opponent:rival.name};
