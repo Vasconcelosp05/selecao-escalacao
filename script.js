@@ -17,6 +17,7 @@ const players = [
   {id:'andreas', name:'Andreas Pereira', position:'MEI', club:'Fulham', price:14.6, rating:8.0, initials:'AP', color:'#1a1a1a'},
   {id:'gerson', name:'Gerson', position:'MEI', club:'Cruzeiro', price:14.8, rating:8.1, initials:'G', color:'#1f61a7'},
   {id:'vinicius', name:'Vinícius Júnior', position:'ATA', club:'Real Madrid', price:22.5, rating:9.3, initials:'VJ', color:'#f0b629'},
+  {id:'neymar', name:'Neymar Jr.', position:'ATA', club:'Santos', price:21.8, rating:9.1, initials:'NJ', color:'#ffffff'},
   {id:'rodrygo', name:'Rodrygo', position:'ATA', club:'Real Madrid', price:19.2, rating:8.7, initials:'R', color:'#e9ba2e'},
   {id:'raphinha', name:'Raphinha', position:'ATA', club:'Barcelona', price:18.9, rating:8.8, initials:'R', color:'#1c438e'},
   {id:'savinho', name:'Savinho', position:'ATA', club:'Manchester City', price:16.7, rating:8.4, initials:'S', color:'#5ba9dc'},
